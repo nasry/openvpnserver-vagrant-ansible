@@ -1,0 +1,11 @@
+---
+- name: setup openvpn-server on jessie 64
+  hosts: openvpn-server
+  become: true
+  become_user: root
+ 
+
+  roles:
+   - openvpn-server
+   - certification
+...

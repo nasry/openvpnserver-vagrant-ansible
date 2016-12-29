@@ -1,0 +1,4 @@
+---
+- include: openvpn.yml
+- include: ufw.yml
+...

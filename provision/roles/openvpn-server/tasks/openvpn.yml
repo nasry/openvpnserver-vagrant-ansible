@@ -1,0 +1,33 @@
+---
+# install and configure openvpn
+- name: update system packages
+  apt:
+   update_cache: yes
+- name: install openvpn and easy-rsa
+  apt: name={{ item }}
+  with_items:
+   - openvpn
+   - easy-rsa
+- name: copy the vpn config example file
+  shell: gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > /etc/openvpn/server.conf
+- name: make the required changes
+  replace:
+    dest: /etc/openvpn/server.conf
+    regexp: '{{ item.old }}'
+    replace: '{{ item.new }}'
+  with_items:
+    - { old: 'dh dh1024.pem' , new: 'dh  dh2048.pem' }
+    - { old: ';push "redirect-gateway def1 bypass-dhcp"' , new: 'push "redirect-gateway def1 bypass-dhcp"' }
+    - { old: ';push "dhcp-option DNS 208.67.222.222"' , new: 'push "dhcp-option DNS 208.67.222.222"' }
+    - { old: ';push "dhcp-option DNS 208.67.220.220"' , new: 'push "dhcp-option DNS 208.67.220.220"' }
+    - { old: ';user nobody' , new: 'user nobody' }
+    - { old: ';group nogroup' , new: 'group nogroup' }
+
+ # enable packet forwarding
+- shell: echo 1 > /proc/sys/net/ipv4/ip_forward
+- replace:
+    dest: /etc/openvpn/server.conf
+    regexp: '#net.ipv4.ip_forward=1'
+    replace: 'net.ipv4.ip_forward=1'
+...
+
